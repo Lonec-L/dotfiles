@@ -1,39 +1,30 @@
-alias f="fvm flutter"
-alias d="fvm dart"
+fpath+=${ZDOTDIR:-~}/.zsh_functions
+# Lines configured by zsh-newuser-install
+HISTFILE=~/.histfile
+HISTSIZE=10000
+SAVEHIST=10000
+bindkey -v
+# End of lines configured by zsh-newuser-install
+# The following lines were added by compinstall
+zstyle :compinstall filename '/home/luka/.zshrc'
+
+autoload -Uz compinit
+compinit
+# End of lines added by compinstall
+#
+alias ls='ls --color=auto'
+
+alias grep='grep --color=auto'
+PS1='[\u@\h \W]\$ '
+. "$HOME/.cargo/env"
+
 alias python="python3"
 alias pip="pip3"
 alias sl="ls"
-source /opt/homebrew/opt/chruby/share/chruby/chruby.sh
-source /opt/homebrew/opt/chruby/share/chruby/auto.sh
-chruby ruby-3.3.0
-export PATH=".:$PATH:/Users/lonec/android_sdk/cmdline-tools/latest/bin"
-export PATH="/Users/lonec/fvm/versions/stable/bin:$PATH"
-export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
-export PATH="/Users/lonec/go/bin:$PATH"
-export PATH="/Users/lonec/personal/gamedev/SDL:$PATH"
-export PATH="/Users/lonec/personal/aseprite/build/bin:$PATH"
-# export PATH="/Users/lonec/.config/nvim/nvim-macos-arm64/bin:$PATH"
-
-export ANDROID_HOME=/Users/$USER/Library/Android/sdk
-export PATH="$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools"
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-## [Completion]
-## Completion scripts setup. Remove the following line to uninstall
-[[ -f /Users/lonec/.dart-cli-completion/zsh-config.zsh ]] && . /Users/lonec/.dart-cli-completion/zsh-config.zsh || true
-## [/Completion]
-
-# Created by `pipx` on 2024-10-21 09:10:14
-export PATH="$PATH:/Users/lonec/.local/bin"
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
-
-source <(fzf --zsh)
-bindkey -s ^f "tmux-sessionizer\n"
+[ -s "$NVM_DIR/zsh_completion" ] && \. "$NVM_DIR/zsh_completion"  # This loads nvm bash_completion
 
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
@@ -139,3 +130,6 @@ fi
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init - zsh)"
+
+source <(fzf --zsh)
+bindkey -s "^F" "tmux-sessionizer\n"
