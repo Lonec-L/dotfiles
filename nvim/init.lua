@@ -960,7 +960,7 @@ require('lazy').setup({
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
     'folke/tokyonight.nvim',
-    opts = {},
+    lazy = false,
     priority = 1000, -- Make sure to load this before all the other start plugins.
     config = function()
       ---@diagnostic disable-next-line: missing-fields
@@ -969,25 +969,27 @@ require('lazy').setup({
           comments = { italic = false }, -- Disable italics in comments
         },
       }
-
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      -- vim.cmd.colorscheme 'tokyonight-night'
     end,
   },
 
   {
     'maxmx03/solarized.nvim',
     lazy = false,
-    priority = 1000,
+    priority = 999, -- Load after tokyonight so both are set up before picking one.
     ---@type solarized.config
     opts = {},
     config = function(_, opts)
       vim.o.termguicolors = true
-      vim.o.background = 'light'
       require('solarized').setup(opts)
-      vim.cmd.colorscheme 'solarized'
+
+      -- Solarized light by default. Override per machine in the untracked
+      -- lua/custom/local.lua, e.g. `vim.g.colorscheme = 'tokyonight-night'`.
+      pcall(require, 'custom.local')
+      local scheme = vim.g.colorscheme or 'solarized'
+      if scheme == 'solarized' then
+        vim.o.background = 'light'
+      end
+      vim.cmd.colorscheme(scheme)
     end,
   },
 
@@ -1031,6 +1033,19 @@ require('lazy').setup({
       local statusline = require 'mini.statusline'
       -- set use_icons to true if you have a Nerd Font
       statusline.setup { use_icons = vim.g.have_nerd_font }
+
+      -- Neovim 0.12 draws 'statusline' in floating windows too, so pickers like
+      -- telescope get a "[Scratch]" line under every pane. Keep floats bare.
+      vim.api.nvim_create_autocmd({ 'WinNew', 'WinEnter', 'BufWinEnter' }, {
+        group = vim.api.nvim_create_augroup('float-no-statusline', { clear = true }),
+        callback = function()
+          for _, win in ipairs(vim.api.nvim_list_wins()) do
+            if vim.api.nvim_win_get_config(win).relative ~= '' then
+              vim.wo[win].statusline = ''
+            end
+          end
+        end,
+      })
 
       -- You can configure sections in the statusline by overriding their
       -- default behavior. For example, here we set the section for

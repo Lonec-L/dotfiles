@@ -2,3 +2,6 @@
 *.bak.*
 .zshrc.local
 .gitconfig.local
+
+# Neovim machine-local overrides
+nvim/lua/custom/local.lua
