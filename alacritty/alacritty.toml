@@ -1,7 +1,8 @@
 [general]
-# Themes come from https://github.com/alacritty/alacritty-theme, cloned by
-# link.sh into ~/.config/alacritty/themes. tokyo-night.toml lives next to this file.
-import = [ "~/.config/alacritty/themes/themes/solarized_light.toml" ] # or "~/.config/alacritty/tokyo-night.toml"
+# theme.toml is a symlink set by dotfiles-theme: tokyo-night.toml next to this
+# file, or a theme from https://github.com/alacritty/alacritty-theme (cloned by
+# link.sh into ~/.config/alacritty/themes).
+import = [ "~/.config/alacritty/theme.toml" ]
 
 [window]
 startup_mode = "Maximized"

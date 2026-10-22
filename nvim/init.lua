@@ -982,14 +982,19 @@ require('lazy').setup({
       vim.o.termguicolors = true
       require('solarized').setup(opts)
 
-      -- Solarized light by default. Override per machine in the untracked
-      -- lua/custom/local.lua, e.g. `vim.g.colorscheme = 'tokyonight-night'`.
-      pcall(require, 'custom.local')
-      local scheme = vim.g.colorscheme or 'solarized'
-      if scheme == 'solarized' then
-        vim.o.background = 'light'
+      -- Theme shared with tmux and Alacritty, set per machine with
+      -- `dotfiles-theme solarized|tokyonight`. Solarized light by default.
+      local f = io.open(vim.fn.expand '~/.config/dotfiles/theme')
+      local theme = f and vim.trim(f:read '*a') or 'solarized'
+      if f then
+        f:close()
       end
-      vim.cmd.colorscheme(scheme)
+      if theme == 'tokyonight' then
+        vim.cmd.colorscheme 'tokyonight-night'
+      else
+        vim.o.background = 'light'
+        vim.cmd.colorscheme 'solarized'
+      end
     end,
   },
 

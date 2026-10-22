@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Pick the color theme for Neovim, tmux and Alacritty on this machine.
+# The choice is stored in ~/.config/dotfiles/theme (not in the repo).
+# Neovim reads that file at startup; tmux and Alacritty load a symlink
+# that this script points at the matching theme file.
+#
+# Usage: dotfiles-theme [solarized|tokyonight]
+#   With no argument, re-applies the stored theme (default: solarized).
+set -euo pipefail
+
+DOTFILES="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)"
+STATE="$HOME/.config/dotfiles/theme"
+
+theme="${1:-$(cat "$STATE" 2>/dev/null || echo solarized)}"
+case "$theme" in
+solarized) alacritty="$HOME/.config/alacritty/themes/themes/solarized_light.toml" ;;
+tokyonight) alacritty="$HOME/.config/alacritty/tokyo-night.toml" ;;
+*)
+	echo "unknown theme: $theme (use solarized or tokyonight)" >&2
+	exit 1
+	;;
+esac
+
+mkdir -p "$(dirname "$STATE")" "$HOME/.config/tmux" "$HOME/.config/alacritty"
+echo "$theme" >"$STATE"
+ln -sfn "$alacritty" "$HOME/.config/alacritty/theme.toml"
+ln -sfn "$DOTFILES/tmux/$theme.conf" "$HOME/.config/tmux/theme.conf"
+
+# Install the theme's tmux plugin if needed and reload a running server.
+if [[ -x "$HOME/.tmux/plugins/tpm/bin/install_plugins" ]]; then
+	"$HOME/.tmux/plugins/tpm/bin/install_plugins" >/dev/null || true
+fi
+if tmux info >/dev/null 2>&1; then
+	tmux source-file "$HOME/.tmux.conf"
+fi
+
+echo "theme: $theme (restart Neovim to apply)"

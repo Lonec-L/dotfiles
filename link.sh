@@ -43,6 +43,7 @@ link git/.gitconfig "$HOME/.gitconfig"
 link prettier/.prettierrc "$HOME/.prettierrc"
 link tmux-sessionizer/tmux-sessionizer "$HOME/.local/bin/tmux-sessionizer"
 link tmux-sessionizer/tmux-sessionizer.conf "$HOME/.config/tmux-sessionizer/tmux-sessionizer.conf"
+link theme/dotfiles-theme "$HOME/.local/bin/dotfiles-theme"
 
 log "Neovim"
 link nvim "$HOME/.config/nvim"
@@ -53,6 +54,10 @@ link alacritty/tokyo-night.toml "$HOME/.config/alacritty/tokyo-night.toml"
 if have git && ! ((DRY_RUN)); then
 	git_clone_or_pull https://github.com/alacritty/alacritty-theme "$HOME/.config/alacritty/themes" --depth 1
 fi
+
+log "Theme (nvim, tmux, alacritty)"
+# Re-applies the theme stored in ~/.config/dotfiles/theme (default: solarized).
+run "$DOTFILES/theme/dotfiles-theme"
 
 # Niri setup: always on Arch, on Ubuntu once niri is installed (60-niri)
 if [[ "$(distro_id)" == "arch" ]] || have niri; then

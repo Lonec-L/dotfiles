@@ -64,6 +64,8 @@ These files are not in the repo. Keep secrets and per-machine settings there.
 - `~/.zshrc.local`: tokens, work-only aliases, extra `PATH` entries.
 - `~/.config/nvim.local/servers.lua`: per-machine LSP overrides, merged over
   `servers` in `nvim/init.lua`, e.g. `return { clangd = { cmd = { 'my-clangd' } } }`.
+- `~/.config/dotfiles/theme`: color theme for Neovim, tmux and Alacritty, `solarized`
+  (default) or `tokyonight`. Set it with `dotfiles-theme tokyonight`.
 
 ## Layout
 
@@ -74,6 +76,8 @@ git/.gitconfig           git aliases and settings (no identity)
 prettier/.prettierrc     global prettier options
 nvim/                    Neovim config
 tmux-sessionizer/        script + search paths
+tmux/                    tmux theme files
+theme/dotfiles-theme     switch theme for nvim, tmux, alacritty
 niri/  swaylock/         Arch, and Ubuntu 26.04+
 JetBrainsMono-2.304/     font files
 wallpapers/
