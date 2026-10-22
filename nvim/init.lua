@@ -205,14 +205,8 @@ vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
 vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
--- Keybinds to make split navigation easier.
---  Use CTRL+<hjkl> to switch between windows
---
---  See `:help wincmd` for a list of all window commands
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+-- Split navigation with CTRL+<hjkl> is set up by vim-tmux-navigator below, so the
+-- same keys also move between tmux panes.
 
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
@@ -1099,6 +1093,42 @@ require('lazy').setup({
     --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
     --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   },
+  { -- CTRL+<hjkl> moves between nvim splits and tmux panes alike.
+    -- The tmux side is the same plugin in ~/.tmux.conf. Outside tmux it only moves between splits.
+    'christoomey/vim-tmux-navigator',
+    cmd = { 'TmuxNavigateLeft', 'TmuxNavigateDown', 'TmuxNavigateUp', 'TmuxNavigateRight', 'TmuxNavigatePrevious' },
+    keys = {
+      { '<C-h>', '<cmd>TmuxNavigateLeft<CR>', desc = 'Move focus left (split or tmux pane)' },
+      { '<C-j>', '<cmd>TmuxNavigateDown<CR>', desc = 'Move focus down (split or tmux pane)' },
+      { '<C-k>', '<cmd>TmuxNavigateUp<CR>', desc = 'Move focus up (split or tmux pane)' },
+      { '<C-l>', '<cmd>TmuxNavigateRight<CR>', desc = 'Move focus right (split or tmux pane)' },
+    },
+  },
+
+  { -- Review diffs across a whole branch: file panel plus side-by-side diffs
+    'sindrets/diffview.nvim',
+    cmd = { 'DiffviewOpen', 'DiffviewClose', 'DiffviewFileHistory' },
+    keys = {
+      { '<leader>gd', '<cmd>DiffviewOpen<CR>', desc = '[G]it [D]iff of uncommitted changes' },
+      {
+        '<leader>gm',
+        function()
+          -- Everything this branch changed since it left the default branch (like a PR).
+          -- --imply-local shows the right side as the real files, so LSP (gd, hover) works there.
+          local base = vim.fn.systemlist({ 'git', 'symbolic-ref', '--short', 'refs/remotes/origin/HEAD' })[1]
+          if vim.v.shell_error ~= 0 or not base then
+            base = 'origin/main'
+          end
+          vim.cmd('DiffviewOpen ' .. base .. '...HEAD --imply-local')
+        end,
+        desc = '[G]it diff against [M]ain (review branch)',
+      },
+      { '<leader>gh', '<cmd>DiffviewFileHistory %<CR>', desc = '[G]it [H]istory of this file' },
+      { '<leader>gH', '<cmd>DiffviewFileHistory<CR>', desc = '[G]it [H]istory of the repo' },
+      { '<leader>gq', '<cmd>DiffviewClose<CR>', desc = '[G]it diff [Q]uit' },
+    },
+  },
+
   {
     'mbbill/undotree',
     init = function()

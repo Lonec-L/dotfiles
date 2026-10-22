@@ -26,7 +26,14 @@ command -v fd >/dev/null || { command -v fdfind >/dev/null && alias fd='fdfind';
 # --- Oh My Zsh ----------------------------------------------------------------
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="robbyrussell"
+# Third-party plugins are cloned into $ZSH_CUSTOM by scripts/ubuntu/10-shell.sh.
+# Only load the ones present, so a machine without them still starts cleanly.
+# zsh-syntax-highlighting must stay last.
 plugins=()
+for plugin in zsh-autosuggestions zsh-syntax-highlighting; do
+    [[ -d ${ZSH_CUSTOM:-$ZSH/custom}/plugins/$plugin ]] && plugins+=($plugin)
+done
+unset plugin
 [[ -f $ZSH/oh-my-zsh.sh ]] && source $ZSH/oh-my-zsh.sh
 
 unsetopt share_history      # don't pull other shells' commands into this one live
@@ -76,3 +83,8 @@ fi
 
 # --- Local overrides (not tracked) --------------------------------------------
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+
+# --- zoxide: smart cd ---------------------------------------------------------
+# `cd dotf` jumps to the best-ranked visited folder matching "dotf", `cdi` picks
+# one with fzf; real paths work as before. zoxide wants to be initialised last.
+command -v zoxide >/dev/null && eval "$(zoxide init zsh --cmd cd)"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Language toolchains: Rust (rustup + rustfmt, clippy, rust-analyzer; then
-# alacritty, eza, git-absorb via cargo), Node via nvm,
+# alacritty, eza, git-absorb, zoxide via cargo), lazygit, Node via nvm,
 # Python via pyenv, and pipx CLI tools.
 set -euo pipefail
 . "$(dirname "$0")/../lib.sh"
@@ -19,24 +19,43 @@ log "Alacritty build deps"
 apt_install cmake g++ pkg-config libfreetype6-dev libfontconfig1-dev \
 	libxcb-xfixes0-dev libxkbcommon-dev python3 desktop-file-utils
 
-log "cargo tools: alacritty eza git-absorb"
-for crate in alacritty eza git-absorb; do
+log "cargo tools: alacritty eza git-absorb zoxide"
+for crate in alacritty eza git-absorb zoxide; do
 	have "$crate" || cargo install --locked "$crate"
 done
 
-log "Alacritty desktop entry + terminfo"
-if [[ ! -f "$HOME/.local/share/applications/Alacritty.desktop" ]]; then
-	tmp="$(mktemp -d)"
-	git clone --quiet --depth 1 https://github.com/alacritty/alacritty.git "$tmp/alacritty"
-	sudo tic -xe alacritty,alacritty-direct "$tmp/alacritty/extra/alacritty.info"
-	mkdir -p "$HOME/.local/share/applications" "$HOME/.local/share/icons/hicolor/scalable/apps" "$HOME/.zsh_functions"
-	cp "$tmp/alacritty/extra/logo/alacritty-term.svg" "$HOME/.local/share/icons/hicolor/scalable/apps/Alacritty.svg"
-	sed "s|^Exec=alacritty|Exec=$HOME/.cargo/bin/alacritty|; s|^TryExec=alacritty|TryExec=$HOME/.cargo/bin/alacritty|" \
-		"$tmp/alacritty/extra/linux/Alacritty.desktop" >"$HOME/.local/share/applications/Alacritty.desktop"
-	cp "$tmp/alacritty/extra/completions/_alacritty" "$HOME/.zsh_functions/_alacritty"
-	rm -rf "$tmp"
-	update-desktop-database "$HOME/.local/share/applications" || true
+log "lazygit (latest GitHub release)"
+lazygit_url="$(curl -fsSL https://api.github.com/repos/jesseduffield/lazygit/releases/latest |
+	grep -oiE 'https://[^"]+_linux_x86_64\.tar\.gz' | head -1)"
+[[ -n "$lazygit_url" ]] || die "could not find the latest lazygit release"
+lazygit_version="$(sed -E 's|.*/download/v([^/]+)/.*|\1|' <<<"$lazygit_url")"
+if [[ "$(lazygit --version 2>/dev/null | grep -oE 'version=[^,]+' | cut -d= -f2)" != "$lazygit_version" ]]; then
+	mkdir -p "$HOME/.local/bin"
+	curl -fsSL "$lazygit_url" | tar -xz -C "$HOME/.local/bin" lazygit
 fi
+echo "   lazygit $lazygit_version"
+
+log "Alacritty menu entry, icon, completions and terminfo"
+# Official files for the installed version. Rewritten on every run, so a stale
+# or hand-made entry gets fixed (wrong icon name, missing StartupWMClass).
+alacritty_version="$(alacritty --version | awk '{print $2}')"
+alacritty_raw="https://raw.githubusercontent.com/alacritty/alacritty/v$alacritty_version/extra"
+mkdir -p "$HOME/.local/share/applications" "$HOME/.local/share/icons/hicolor/scalable/apps" "$HOME/.zsh_functions"
+curl -fsSL -o "$HOME/.local/share/icons/hicolor/scalable/apps/Alacritty.svg" "$alacritty_raw/logo/alacritty-term.svg"
+# Icon by full path: an icon named "Alacritty" elsewhere (e.g. a 64px PNG in
+# /usr/share/icons/hicolor/scalable) would otherwise win and look blurry.
+curl -fsSL "$alacritty_raw/linux/Alacritty.desktop" |
+	sed "s|^Exec=alacritty|Exec=$HOME/.cargo/bin/alacritty|; s|^TryExec=alacritty|TryExec=$HOME/.cargo/bin/alacritty|; s|^Icon=.*|Icon=$HOME/.local/share/icons/hicolor/scalable/apps/Alacritty.svg|" \
+		>"$HOME/.local/share/applications/Alacritty.desktop"
+update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
+curl -fsSL -o "$HOME/.zsh_functions/_alacritty" "$alacritty_raw/completions/_alacritty"
+if ! infocmp alacritty >/dev/null 2>&1; then
+	tmp="$(mktemp -d)"
+	curl -fsSL -o "$tmp/alacritty.info" "$alacritty_raw/alacritty.info"
+	sudo tic -xe alacritty,alacritty-direct "$tmp/alacritty.info"
+	rm -rf "$tmp"
+fi
+
 # Make Alacritty the terminal for Ctrl+Alt+T in GNOME
 if have gsettings; then
 	gsettings set org.gnome.desktop.default-applications.terminal exec "$HOME/.cargo/bin/alacritty" || true

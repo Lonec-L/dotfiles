@@ -44,6 +44,12 @@ git_clone_or_pull() {
 
 distro_id() { . /etc/os-release && echo "$ID"; }
 
+# Usage: ubuntu_at_least 26.04 -> true on Ubuntu with VERSION_ID >= 26.04
+ubuntu_at_least() {
+	[[ "$(distro_id)" == ubuntu ]] &&
+		dpkg --compare-versions "$(. /etc/os-release && echo "$VERSION_ID")" ge "$1"
+}
+
 # Ask for the git author name and email and store them in ~/.gitconfig.local,
 # which is not tracked. Current values are offered as defaults, so pressing
 # Enter keeps them. Without a terminal, existing values are kept as they are.

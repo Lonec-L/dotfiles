@@ -1,7 +1,8 @@
 # dotfiles
 
-Configs for zsh, tmux, alacritty, git and tmux-sessionizer, plus install scripts
-for a fresh Ubuntu 24.04 machine. Niri and swaylock are for the Arch setup only.
+Configs for zsh, tmux, alacritty, git, Neovim and tmux-sessionizer, plus install
+scripts for a fresh Ubuntu machine (24.04 and newer). Niri and swaylock are used on
+Arch, and on Ubuntu 26.04 and newer.
 
 The Neovim config is in `nvim/`, based on
 [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim) (MIT, see `nvim/LICENSE.md`).
@@ -27,10 +28,11 @@ right after the first step. Every step can be re-run safely.
 | `10-shell`    | Oh My Zsh, fzf, tmux plugin manager + plugins, zsh as default shell   |
 | `20-fonts`    | JetBrains Mono (from this repo) and JetBrainsMono Nerd Font          |
 | `25-toolchains` | clang/LLVM from apt.llvm.org, latest Go, Lua 5.4 + luarocks         |
-| `30-dev`      | Rust (rustup, rustfmt, clippy, rust-analyzer), alacritty (+ Nautilus "Open in Alacritty"), eza, git-absorb, nvm + Node LTS, pyenv, pipx tools |
+| `30-dev`      | Rust (rustup, rustfmt, clippy, rust-analyzer), zoxide, lazygit, alacritty (+ Nautilus "Open in Alacritty"), eza, git-absorb, nvm + Node LTS, pyenv, pipx tools |
 | `35-embedded` | arm-none-eabi gcc, openocd, serial tools, west                        |
 | `40-neovim`   | latest stable Neovim in `/opt`, installs plugins and treesitter parsers |
-| `50-apps`     | asks for each: Docker, VS Code, Signal, VLC + GIMP                    |
+| `50-apps`     | asks for each: Docker, VS Code, Signal, VLC, GIMP (latest official AppImage) |
+| `60-niri`     | Ubuntu 26.04+ only: niri + DankMaterialShell from the DankLinux PPAs, swaylock, fuzzel, waybar |
 
 Useful variants:
 
@@ -48,7 +50,10 @@ ASSUME_YES=1 ./install.sh        # say yes to every optional app
 ```
 
 `link.sh` symlinks each config into `$HOME`. An existing file is moved to
-`<file>.bak.<timestamp>`, never deleted. This includes `~/.config/nvim`. On Arch it also links `niri/` and `swaylock/`.
+`<file>.bak.<timestamp>`, never deleted. This includes `~/.config/nvim`. It also links
+`niri/` and `swaylock/` on Arch, or on Ubuntu once niri is installed.
+
+`install.sh` is Ubuntu only. On Arch, install packages yourself and run `./link.sh`.
 
 ## Private and machine-specific settings
 
@@ -69,7 +74,7 @@ git/.gitconfig           git aliases and settings (no identity)
 prettier/.prettierrc     global prettier options
 nvim/                    Neovim config
 tmux-sessionizer/        script + search paths
-niri/  swaylock/         Arch only
+niri/  swaylock/         Arch, and Ubuntu 26.04+
 JetBrainsMono-2.304/     font files
 wallpapers/
 install.sh  link.sh  scripts/

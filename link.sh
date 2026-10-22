@@ -54,8 +54,9 @@ if have git && ! ((DRY_RUN)); then
 	git_clone_or_pull https://github.com/alacritty/alacritty-theme "$HOME/.config/alacritty/themes" --depth 1
 fi
 
-if [[ "$(distro_id)" == "arch" ]]; then
-	log "Arch only: niri, swaylock"
+# Niri setup: always on Arch, on Ubuntu once niri is installed (60-niri)
+if [[ "$(distro_id)" == "arch" ]] || have niri; then
+	log "Niri, swaylock"
 	link niri "$HOME/.config/niri"
 	link swaylock "$HOME/.config/swaylock"
 fi

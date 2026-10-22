@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# zsh + Oh My Zsh, fzf, tmux plugin manager. Run after link.sh so the tmux
-# plugins listed in ~/.tmux.conf get installed.
+# zsh + Oh My Zsh (with autosuggestions and syntax highlighting), fzf, tmux
+# plugin manager. Run after link.sh so the tmux plugins in ~/.tmux.conf get installed.
 set -euo pipefail
 . "$(dirname "$0")/../lib.sh"
 
@@ -10,6 +10,11 @@ if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
 	RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c \
 		"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
+
+log "Oh My Zsh plugins: autosuggestions, syntax highlighting"
+zsh_custom="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+git_clone_or_pull https://github.com/zsh-users/zsh-autosuggestions "$zsh_custom/plugins/zsh-autosuggestions" --depth 1
+git_clone_or_pull https://github.com/zsh-users/zsh-syntax-highlighting "$zsh_custom/plugins/zsh-syntax-highlighting" --depth 1
 
 log "fzf"
 git_clone_or_pull https://github.com/junegunn/fzf.git "$HOME/.fzf" --depth 1
