@@ -1,9 +1,17 @@
 [general]
-import = [ "/Users/lonec/.config/alacritty/tokyo-night.toml" ] # or tokyo-night-storm.toml
+# Themes come from https://github.com/alacritty/alacritty-theme, cloned by
+# link.sh into ~/.config/alacritty/themes. tokyo-night.toml lives next to this file.
+import = [ "~/.config/alacritty/themes/themes/solarized_light.toml" ] # or "~/.config/alacritty/tokyo-night.toml"
+
 [window]
 startup_mode = "Maximized"
+
 [font]
-normal = { family = "JetBrainsMono Nerd Font Mono", style = "Regular" }
-size = 18
-[env]
-TERM = "xterm-256color"
+normal = { family = "JetBrainsMono", style = "Regular" }
+size = 15
+
+# Shift+Enter inserts a newline in Claude Code (added by /terminal-setup)
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001B\r"

@@ -1,0 +1,4 @@
+# Machine-local files that must never be committed
+*.bak.*
+.zshrc.local
+.gitconfig.local

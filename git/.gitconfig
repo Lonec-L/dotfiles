@@ -1,0 +1,55 @@
+# The git author (name and email) lives in ~/.gitconfig.local, which is not
+# tracked. install.sh and link.sh ask for it. It is included at the end, so it
+# can override anything below.
+[init]
+	defaultBranch = main
+[core]
+	editor = nvim
+	autocrlf = false
+	# Fall back to plain output where diff-so-fancy is not installed
+	pager = "if command -v diff-so-fancy >/dev/null; then diff-so-fancy | less --tabs=4 -RFX; else less --tabs=4 -RFX; fi"
+[interactive]
+	diffFilter = "if command -v diff-so-fancy >/dev/null; then diff-so-fancy --patch; else cat; fi"
+[color]
+	ui = true
+[color "diff-highlight"]
+	oldNormal = red bold
+	oldHighlight = red bold 52
+	newNormal = green bold
+	newHighlight = green bold 22
+[color "diff"]
+	meta = 11
+	frag = magenta bold
+	func = 146 bold
+	commit = yellow bold
+	old = red bold
+	new = green bold
+	whitespace = red reverse
+[credential "https://github.com"]
+	helper =
+	helper = !gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !gh auth git-credential
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[alias]
+	st = status
+	co = checkout
+	ca = commit --amend
+	p = push
+	dif = --no-pager diff
+	plog = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+	plog2 = "log --all --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+	recommit = !git commit -eF \"$(git rev-parse --git-path COMMIT_EDITMSG)\"
+[push]
+	autoSetupRemote = true
+[diff]
+	tool = nvimdiff
+[difftool]
+	prompt = false
+[include]
+	path = ~/.gitconfig.local
